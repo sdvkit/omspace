@@ -1,0 +1,37 @@
+{
+  "service": {
+    "indexes": {
+      "nextConnectionId": 1,
+      "nextSupportedStorageId": 1,
+      "nextUserStorageId": 1
+    }
+  },
+  "supportedStorages": [
+    {
+      "id": 0,
+      "storageIcon": "https://firebasestorage.googleapis.com/v0/b/omspace-d0957.appspot.com/o/icons%2Flogos%2Fic_dropbox_512.png?alt=media&token=49d0d191-9aba-43a8-a3ad-ec108fd0e47d",
+      "storageName": "Dropbox",
+      "typeName": "DROPBOX"
+    }
+  ],
+  "users": {
+    "QCBSzLlenvTBKazccZDd8kHe2YM2": {
+      "connections": [
+        {
+          "accessToken": {
+            "value": "token"
+          },
+          "typeName": "DROPBOX"
+        }
+      ],
+      "storages": [
+        {
+          "id": 0,
+          "storageOwnerUsername": "sdvkit",
+          "supportedStorageId": 0,
+          "totalCapacity": 2
+        }
+      ]
+    }
+  }
+}

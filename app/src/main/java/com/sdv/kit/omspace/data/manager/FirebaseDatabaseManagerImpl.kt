@@ -8,6 +8,8 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.sdv.kit.omspace.domain.manager.FirebaseDatabaseManager
+import com.sdv.kit.omspace.domain.model.FirebaseIndexes
+import com.sdv.kit.omspace.util.FirebaseReference
 
 class FirebaseDatabaseManagerImpl : FirebaseDatabaseManager {
 
@@ -31,8 +33,8 @@ class FirebaseDatabaseManagerImpl : FirebaseDatabaseManager {
         getReference(reference).setValue(value)
     }
 
-    override fun <T> pushValue(reference: String, value: T) {
-        getReference(reference).push().setValue(value)
+    override fun updateIndexes(indexes: FirebaseIndexes) {
+        getReference(FirebaseReference.INDEXES).setValue(indexes)
     }
 
     private fun getReference(reference: String): DatabaseReference {

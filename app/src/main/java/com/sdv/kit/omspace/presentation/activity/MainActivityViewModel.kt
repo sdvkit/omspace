@@ -5,7 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sdv.kit.omspace.domain.usecase.auth.google.GetSignedInGoogleUser
+import com.sdv.kit.omspace.domain.usecase.auth.google.GetSingedInGoogleUser
 import com.sdv.kit.omspace.presentation.navigation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
-    private val getSignedInGoogleUser: GetSignedInGoogleUser
+    private val getSignedInGoogleUser: GetSingedInGoogleUser
 ) : ViewModel() {
 
     private val _isLoading = mutableStateOf(false)

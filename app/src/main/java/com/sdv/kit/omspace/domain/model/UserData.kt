@@ -1,6 +1,6 @@
 package com.sdv.kit.omspace.domain.model
 
-data class UserData(
+open class UserData(
     val userId: String,
     val username: String?,
     val profilePictureUrl: String?

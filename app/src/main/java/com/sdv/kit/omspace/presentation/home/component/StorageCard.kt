@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import coil.compose.rememberAsyncImagePainter
 import com.sdv.kit.omspace.R
-import com.sdv.kit.omspace.domain.model.StorageType
 import com.sdv.kit.omspace.domain.model.UserStorage
 import com.sdv.kit.omspace.presentation.Dimens
 import com.sdv.kit.omspace.presentation.SampleData
@@ -34,10 +33,9 @@ fun StorageCard(
     modifier: Modifier = Modifier,
     storage: UserStorage
 ) {
-    val storageType = StorageType.nameOf(storage.storageTypeName)
-    val supportedStorageIcon = storageType.storageIcon
-    val supportedStorageName = storageType.storageName
-    val storageOwnerUsername = storage.storageOwner.storageOwnerUsername
+    val supportedStorageIcon = storage.supportedStorage.storageIcon
+    val supportedStorageName = storage.supportedStorage.storageName
+    val storageOwnerUsername = storage.storageOwnerUsername
     val occupiedSpace = storage.occupiedSpace
     val totalCapacity = storage.totalCapacity
 

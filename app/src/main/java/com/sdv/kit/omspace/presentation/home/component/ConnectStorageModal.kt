@@ -23,7 +23,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.sdv.kit.omspace.R
 import com.sdv.kit.omspace.domain.model.StorageType
+import com.sdv.kit.omspace.domain.model.SupportedStorage
 import com.sdv.kit.omspace.presentation.Dimens
+import com.sdv.kit.omspace.presentation.SampleData
 import com.sdv.kit.omspace.presentation.annotation.LightAndDarkDefaultPreview
 import com.sdv.kit.omspace.presentation.annotation.LightAndDarkLandscapePreview
 import com.sdv.kit.omspace.presentation.common.button.SquareRoundedIcon
@@ -34,7 +36,7 @@ import com.sdv.kit.omspace.ui.theme.AppTheme
 fun ConnectStorageModal(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit,
-    storages: List<StorageType>,
+    supportedStorages: List<SupportedStorage>,
     onClickHandler: (StorageType) -> Unit
 ) {
     ModalBottomSheet(
@@ -45,7 +47,7 @@ fun ConnectStorageModal(
     ) {
         ConnectStorageModalContent(
             modifier = Modifier.padding(horizontal = Dimens.PADDING_MEDIUM),
-            storages = storages,
+            supportedStorages = supportedStorages,
             onClickHandler = onClickHandler
         )
     }
@@ -54,7 +56,7 @@ fun ConnectStorageModal(
 @Composable
 private fun ConnectStorageModalContent(
     modifier: Modifier = Modifier,
-    storages: List<StorageType>,
+    supportedStorages: List<SupportedStorage>,
     onClickHandler: (StorageType) -> Unit
 ) {
     Column(modifier = modifier) {
@@ -65,7 +67,7 @@ private fun ConnectStorageModalContent(
         Spacer(modifier = Modifier.height(Dimens.PADDING_MEDIUM))
         ConnectStorageModalButtons(
             modifier = Modifier.fillMaxWidth(),
-            storages = storages,
+            supportedStorages = supportedStorages,
             onClickHandler = onClickHandler
         )
         Spacer(modifier = Modifier.height(Dimens.PADDING_BIG))
@@ -75,17 +77,17 @@ private fun ConnectStorageModalContent(
 @Composable
 private fun ConnectStorageModalButtons(
     modifier: Modifier = Modifier,
-    storages: List<StorageType>,
+    supportedStorages: List<SupportedStorage>,
     onClickHandler: (StorageType) -> Unit
 ) {
     Column(modifier = modifier) {
-        for (storage in storages) {
+        for (supportedStorage in supportedStorages) {
             ConnectStorageButton(
                 modifier = Modifier.fillMaxWidth(),
-                storageName = storage.storageName,
-                icon = storage.storageIcon,
+                storageName = supportedStorage.storageName,
+                icon = supportedStorage.storageIcon,
                 onClick = {
-                    onClickHandler(storage)
+                    onClickHandler(supportedStorage.storageType)
                 }
             )
             Spacer(modifier = Modifier.height(Dimens.PADDING_EXTRA_SMALL))
@@ -145,7 +147,7 @@ fun ConnectStorageModalPreview() {
             sheetContent = {
                 ConnectStorageModalContent(
                     modifier = Modifier.padding(all = Dimens.PADDING_MEDIUM),
-                    storages = StorageType.values().toList(),
+                    supportedStorages = SampleData.supportedStorages,
                     onClickHandler = {}
                 )
             },

@@ -52,11 +52,7 @@ private val LightSpecialColors = SpecialColors(
     successContainer = successContainer,
     onSuccessContainer = onSuccessContainer,
     successContainerVariant = successContainerVariant,
-    onSuccessContainerVariant = onSuccessContainerVariant,
-    warningContainer = warningContainer,
-    onWarningContainer = onWarningContainer,
-    warningContainerVariant = warningContainerVariant,
-    onWarningContainerVariant = onWarningContainerVariant
+    onSuccessContainerVariant = onSuccessContainerVariant
 )
 
 private val DarkColors = darkColorScheme(
@@ -95,11 +91,7 @@ private val DarkSpecialColors = SpecialColors(
     successContainer = successContainer,
     onSuccessContainer = onSuccessContainer,
     successContainerVariant = successContainerVariant,
-    onSuccessContainerVariant = onSuccessContainerVariant,
-    warningContainer = warningContainer,
-    onWarningContainer = onWarningContainer,
-    warningContainerVariant = warningContainerVariant,
-    onWarningContainerVariant = onWarningContainerVariant
+    onSuccessContainerVariant = onSuccessContainerVariant
 )
 
 @Composable
@@ -156,9 +148,5 @@ class SpecialColors(
     val successContainer: Color,
     val onSuccessContainer: Color,
     val successContainerVariant: Color,
-    val onSuccessContainerVariant: Color,
-    val warningContainer: Color,
-    val onWarningContainer: Color,
-    val warningContainerVariant: Color,
-    val onWarningContainerVariant: Color
+    val onSuccessContainerVariant: Color
 )

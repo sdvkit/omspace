@@ -33,7 +33,7 @@ class LaunchAuthorizationRequest @Inject constructor(
 
     private fun buildAuthorizationRequest(storageType: StorageType): Result<AuthorizationRequest> {
         when (storageType) {
-            StorageType.DROPBOX -> {
+            is StorageType.Dropbox -> {
                 val redirectUri = Uri.parse(storageType.redirectUri)
                 val authorizeUri = Uri.parse(storageType.authorizeUri)
                 val tokenUri = Uri.parse(storageType.tokenUri)

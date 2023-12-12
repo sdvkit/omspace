@@ -24,6 +24,10 @@ class DropboxUserData(
     val team: Team,
     @SerializedName("team_member_id")
     val teamMemberId: String
+) : UserData(
+    userId = accountId,
+    username = name.displayName,
+    profilePictureUrl = null
 )
 
 data class AccountType(

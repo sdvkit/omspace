@@ -40,13 +40,13 @@ class SignInViewModel @Inject constructor(
         launcher: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>
     ) {
         viewModelScope.launch {
-            launchGoogleIntentSender(launcher = launcher)
+            launchGoogleIntentSender(launcher)
         }
     }
 
     private fun signIn(intent: Intent) {
         viewModelScope.launch {
-            val authResult = signInWithGoogle(intent = intent)
+            val authResult = signInWithGoogle(intent)
 
             _state.update { currentState ->
                 currentState.copy(

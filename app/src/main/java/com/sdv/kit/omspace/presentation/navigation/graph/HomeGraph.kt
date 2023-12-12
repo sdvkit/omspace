@@ -23,7 +23,6 @@ import androidx.navigation.compose.composable
 import coil.compose.rememberAsyncImagePainter
 import com.sdv.kit.omspace.OMSpaceApplication
 import com.sdv.kit.omspace.R
-import com.sdv.kit.omspace.domain.model.StorageType
 import com.sdv.kit.omspace.presentation.Dimens
 import com.sdv.kit.omspace.presentation.common.Divider
 import com.sdv.kit.omspace.presentation.common.DividerOrientation
@@ -49,8 +48,8 @@ fun NavGraphBuilder.homeGraph(navController: NavHostController) {
         val username = homeState.user?.username ?: ""
         val storages = homeState.userStorages
         val lastConnectedStorageType = homeState.lastStorageConnection
+        val lastSupportedStorage = homeState.lastSupportedStorage
         val isStorageConnectedMessageVisible = homeState.isStorageConnectedMessageVisible
-        val isStorageAlreadyConnectedMessageVisible = homeState.isStorageAlreadyConnectedMessageVisible
 
         val launcher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.StartActivityForResult()
@@ -94,7 +93,7 @@ fun NavGraphBuilder.homeGraph(navController: NavHostController) {
                         modifier = Modifier
                             .widthIn(max = Dimens.BOTTOM_SHEET_MAX_WIDTH)
                             .fillMaxWidth(),
-                        storages = StorageType.notEmptyValues(),
+                        supportedStorages = homeState.supportedStorages,
                         onDismissRequest = {
                             homeViewModel.onEvent(HomeEvent.ShowConnectStorageModal(false))
                         },
@@ -113,7 +112,7 @@ fun NavGraphBuilder.homeGraph(navController: NavHostController) {
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
-                    val painter = rememberAsyncImagePainter(model = lastConnectedStorageType.storageIcon)
+                    val painter = rememberAsyncImagePainter(model = lastSupportedStorage.storageIcon)
 
                     MessageDialog(
                         modifier = Modifier
@@ -132,35 +131,7 @@ fun NavGraphBuilder.homeGraph(navController: NavHostController) {
                             homeViewModel.onEvent(HomeEvent.ShowConnectStorageModal(false))
                         },
                         painter = painter,
-                        message = "${lastConnectedStorageType.storageName} has been successfully connected."
-                    )
-                }
-
-                AnimatedVisibility(
-                    visible = isStorageAlreadyConnectedMessageVisible,
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    val painter = rememberAsyncImagePainter(model = lastConnectedStorageType.storageIcon)
-
-                    MessageDialog(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .animateEnterExit(
-                                enter = slideInVertically(),
-                                exit = slideOutVertically()
-                            )
-                            .padding(top = Dimens.PADDING_MEDIUM)
-                            .height(Dimens.MESSAGE_DIALOG_HEIGHT),
-                        containerColor = AppTheme.specialColors.warningContainer,
-                        contentColor = AppTheme.specialColors.onWarningContainer,
-                        imageContainerColor = AppTheme.specialColors.warningContainerVariant,
-                        onDismissRequest = {
-                            homeViewModel.onEvent(HomeEvent.ShowStorageAlreadyConnectedMessageDialog(false))
-                            homeViewModel.onEvent(HomeEvent.ShowConnectStorageModal(false))
-                        },
-                        painter = painter,
-                        message = "${lastConnectedStorageType.storageName} already connected."
+                        message = "${lastSupportedStorage.storageName} has been successfully connected."
                     )
                 }
             }

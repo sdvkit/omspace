@@ -1,11 +1,10 @@
 package com.sdv.kit.omspace.domain.repository
 
 import com.sdv.kit.omspace.data.remote.dto.AccessToken
-import com.sdv.kit.omspace.domain.model.UserData
-import com.sdv.kit.omspace.domain.model.UserStorage
+import kotlinx.coroutines.flow.Flow
 
 interface StorageRepository {
     suspend fun getAccessToken(authCode: String, codeVerifier: String): Result<AccessToken>
-    suspend fun saveUserStorageConnection(userStorage: UserStorage): Result<UserStorage>
-    suspend fun getCurrentUserData(accessToken: AccessToken): Result<UserData>
+    suspend fun saveLocalAccessToken(token: AccessToken): Result<AccessToken>
+    suspend fun readLocalAccessToken(): Flow<Result<AccessToken>>
 }

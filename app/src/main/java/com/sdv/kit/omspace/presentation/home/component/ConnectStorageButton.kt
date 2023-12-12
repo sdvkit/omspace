@@ -15,8 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import coil.compose.rememberAsyncImagePainter
-import com.sdv.kit.omspace.domain.model.StorageType
 import com.sdv.kit.omspace.presentation.Dimens
+import com.sdv.kit.omspace.presentation.SampleData
 import com.sdv.kit.omspace.presentation.annotation.LightAndDarkDefaultPreview
 import com.sdv.kit.omspace.ui.theme.AppTheme
 
@@ -64,7 +64,7 @@ fun ConnectStorageButton(
 @Composable
 fun ConnectStorageButtonPreview() {
     AppTheme {
-        val storage = StorageType.DROPBOX
+        val storage = SampleData.supportedStorages[0]
 
         ConnectStorageButton(
             modifier = Modifier

@@ -1,7 +1,10 @@
 package com.sdv.kit.omspace.di
 
+import android.app.Application
 import com.sdv.kit.omspace.data.manager.FirebaseDatabaseManagerImpl
+import com.sdv.kit.omspace.data.manager.LocalStorageManagerImpl
 import com.sdv.kit.omspace.domain.manager.FirebaseDatabaseManager
+import com.sdv.kit.omspace.domain.manager.LocalStorageManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,6 +19,12 @@ class ManagerModule {
     @Singleton
     fun provideFirebaseDatabaseManager(): FirebaseDatabaseManager =
         FirebaseDatabaseManagerImpl()
+
+    @Provides
+    @Singleton
+    fun provideLocalStorageManager(
+        application: Application
+    ): LocalStorageManager = LocalStorageManagerImpl(application)
 
 //    @Provides
 //    @Singleton

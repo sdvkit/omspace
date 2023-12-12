@@ -5,24 +5,20 @@ import com.sdv.kit.omspace.data.repository.DropboxRepositoryImpl
 import com.sdv.kit.omspace.domain.model.StorageType
 import javax.inject.Inject
 
-class GetAccessToken @Inject constructor(
-    private val dropboxRepositoryImpl: DropboxRepositoryImpl
+class SaveLocalAccessToken @Inject constructor(
+    private val dropboxRepository: DropboxRepositoryImpl
 ) {
 
     suspend operator fun invoke(
         storageType: StorageType,
-        authCode: String,
-        codeVerifier: String
+        token: AccessToken
     ): Result<AccessToken> {
         return when (storageType) {
             is StorageType.Dropbox -> {
-                dropboxRepositoryImpl.getAccessToken(
-                    authCode = authCode,
-                    codeVerifier = codeVerifier
-                )
+                dropboxRepository.saveLocalAccessToken(token)
             }
 
-            else -> return Result.failure(
+            else -> Result.failure(
                 RuntimeException("Something goes wrong with StorageType $storageType")
             )
         }

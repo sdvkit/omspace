@@ -5,16 +5,16 @@ import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sdv.kit.omspace.domain.model.StorageConnection
-import com.sdv.kit.omspace.domain.model.StorageOwner
+import com.sdv.kit.omspace.data.remote.dto.AccessToken
 import com.sdv.kit.omspace.domain.model.StorageType
-import com.sdv.kit.omspace.domain.model.UserStorage
+import com.sdv.kit.omspace.domain.model.SupportedStorage
 import com.sdv.kit.omspace.domain.usecase.auth.GetAccessToken
 import com.sdv.kit.omspace.domain.usecase.auth.LaunchAuthorizationRequest
-import com.sdv.kit.omspace.domain.usecase.auth.google.GetSignedInGoogleUser
-import com.sdv.kit.omspace.domain.usecase.firebase.GetConnectedUserData
-import com.sdv.kit.omspace.domain.usecase.firebase.ObserveFirebaseUserStorageList
-import com.sdv.kit.omspace.domain.usecase.firebase.SaveUserStorageConnection
+import com.sdv.kit.omspace.domain.usecase.auth.google.GetSingedInGoogleUser
+import com.sdv.kit.omspace.domain.usecase.firebase.GetFirebaseIndexes
+import com.sdv.kit.omspace.domain.usecase.firebase.GetFirebaseSupportedStorageList
+import com.sdv.kit.omspace.domain.usecase.firebase.GetFirebaseUserStorageList
+import com.sdv.kit.omspace.domain.usecase.firebase.SaveFirebaseStorageConnection
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,12 +24,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getSignedInGoogleUser: GetSignedInGoogleUser,
-    private val observeFirebaseUserStorageList: ObserveFirebaseUserStorageList,
+    private val getSingedInGoogleUser: GetSingedInGoogleUser,
+    private val getFirebaseSupportedStorageList: GetFirebaseSupportedStorageList,
+    private val getFirebaseUserStorageList: GetFirebaseUserStorageList,
     private val launchAuthorizationRequest: LaunchAuthorizationRequest,
     private val getAccessToken: GetAccessToken,
-    private val saveUserStorageConnection: SaveUserStorageConnection,
-    private val getConnectedUserData: GetConnectedUserData
+    private val getFirebaseIndexes: GetFirebaseIndexes,
+    private val saveFirebaseStorageConnection: SaveFirebaseStorageConnection
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -38,6 +39,7 @@ class HomeViewModel @Inject constructor(
     init {
         getSignedInUser()
         getUserStorages()
+        getIndexes()
     }
 
     fun onEvent(event: HomeEvent) {
@@ -64,9 +66,26 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.ShowStorageConnectedMessageDialog -> {
                 showStorageConnectedMessageDialog(event.isVisible)
             }
+        }
+    }
 
-            is HomeEvent.ShowStorageAlreadyConnectedMessageDialog -> {
-                showStorageAlreadyConnectedMessageDialog(event.isVisible)
+    private fun saveStorageConnection(
+        storageType: StorageType,
+        accessToken: AccessToken
+    ) {
+        val indexes = _state.value.firebaseIndexes
+
+        viewModelScope.launch {
+            saveFirebaseStorageConnection(storageType, accessToken, indexes)
+        }
+    }
+
+    private fun getIndexes() {
+        viewModelScope.launch {
+            getFirebaseIndexes { firebaseIndexes ->
+                _state.update { currentState ->
+                    currentState.copy(firebaseIndexes = firebaseIndexes)
+                }
             }
         }
     }
@@ -82,76 +101,18 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun showStorageAlreadyConnectedMessageDialog(isVisible: Boolean) {
-        viewModelScope.launch {
-            _state.update { currentState ->
-                currentState.copy(
-                    isStorageAlreadyConnectedMessageVisible = isVisible,
-                    isConnectModalVisible = false
-                )
-            }
-        }
-    }
-
     private fun getAccessTokenFromAuthCode(
         storageType: StorageType,
         authCode: String,
         codeVerifier: String
     ) {
         viewModelScope.launch {
-            val tokenResult = getAccessToken(
-                storageType = storageType,
-                authCode = authCode,
-                codeVerifier = codeVerifier
-            )
+            val tokenResult = getAccessToken(storageType, authCode, codeVerifier)
 
-            if (tokenResult.isFailure) {
-                return@launch
-            }
-
-            val connectedUserDataResult = getConnectedUserData(
-                storageType = storageType,
-                accessToken = tokenResult.getOrThrow()
-            )
-
-            if (connectedUserDataResult.isFailure) {
-                return@launch
-            }
-
-            if (findUserStorageByOwnerIdAndType(
-                    storageType = storageType,
-                    storageOwnerId = connectedUserDataResult.getOrThrow().userId
-            ) != null) {
-                showStorageAlreadyConnectedMessageDialog(true)
-                return@launch
-            }
-
-            val saveResult = saveUserStorageConnection(userStorage = UserStorage(
-                storageTypeName = storageType.storageName,
-                storageConnection = StorageConnection(
-                    accessToken = tokenResult.getOrThrow()
-                ),
-                storageOwner = StorageOwner(
-                    storageOwnerId = connectedUserDataResult.getOrThrow().userId,
-                    storageOwnerUsername = connectedUserDataResult.getOrThrow().username ?: return@launch
-                ),
-                occupiedSpace = 0f,
-                totalCapacity = 0f
-            ))
-
-            if (saveResult.isSuccess) {
+            if (tokenResult.isSuccess) {
+                saveStorageConnection(storageType, tokenResult.getOrThrow())
                 showStorageConnectedMessageDialog(true)
             }
-        }
-    }
-
-    private fun findUserStorageByOwnerIdAndType(
-        storageOwnerId: String,
-        storageType: StorageType
-    ): UserStorage? {
-        return _state.value.userStorages.find { storage ->
-            storage.storageOwner.storageOwnerId == storageOwnerId
-                    && storage.storageTypeName == storageType.storageName
         }
     }
 
@@ -166,14 +127,15 @@ class HomeViewModel @Inject constructor(
         storageType: StorageType
     ) {
         viewModelScope.launch {
-            val request = launchAuthorizationRequest(
-                launcher = launcher,
-                storageType = storageType
-            )
+            val request = launchAuthorizationRequest(launcher, storageType)
+            val supportedStorage = findSupportedStorageByClass(storageType) ?: return@launch
 
             if (request.isSuccess) {
                 _state.update { currentState ->
-                    currentState.copy(lastStorageConnection = storageType)
+                    currentState.copy(
+                        lastStorageConnection = storageType,
+                        lastSupportedStorage = supportedStorage
+                    )
                 }
             }
         }
@@ -181,36 +143,54 @@ class HomeViewModel @Inject constructor(
 
     private fun getUserStorages() {
         viewModelScope.launch {
-            val signedInUserResult = getSignedInGoogleUser()
+            val signedInUser = getSingedInGoogleUser()
 
-            if (signedInUserResult.isFailure) {
-                return@launch
-            }
-
-            observeFirebaseUserStorageList(
-                uid = signedInUserResult.getOrThrow().userId
-            ) { storages ->
-                _state.update { currentState ->
-                    currentState.copy(
-                        userStorages = storages,
-                        isContentLoading = false
-                    )
+            getSupportedStorages {
+                getFirebaseUserStorageList(
+                    uid = signedInUser!!.userId,
+                    transform = { storage ->
+                        storage.supportedStorage = findSupportedStorageById(storage.supportedStorage.id)
+                            ?: return@getFirebaseUserStorageList
+                    }
+                ) { storages ->
+                    _state.update { currentState ->
+                        currentState.copy(
+                            userStorages = storages,
+                            isContentLoading = false
+                        )
+                    }
                 }
             }
         }
     }
 
+    private fun getSupportedStorages(onSuccess: () -> Unit) {
+        getFirebaseSupportedStorageList { storages ->
+            _state.update { currentState ->
+                currentState.copy(supportedStorages = storages)
+            }
+
+            onSuccess()
+        }
+    }
+
     private fun getSignedInUser() {
         viewModelScope.launch {
-            val signedInUserResult = getSignedInGoogleUser()
-
-            if (signedInUserResult.isFailure) {
-                return@launch
-            }
+            val signedInUser = getSingedInGoogleUser()
 
             _state.update { currentState ->
-                currentState.copy(user = signedInUserResult.getOrThrow())
+                currentState.copy(user = signedInUser)
             }
+        }
+    }
+
+    private fun findSupportedStorageById(id: Long): SupportedStorage? {
+        return _state.value.supportedStorages.find { it.id == id }
+    }
+
+    private fun findSupportedStorageByClass(storageType: StorageType): SupportedStorage? {
+        return _state.value.supportedStorages.find { supportedStorage ->
+            supportedStorage.storageType.javaClass == storageType.javaClass
         }
     }
 }

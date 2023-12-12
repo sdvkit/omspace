@@ -21,6 +21,4 @@ sealed class HomeEvent {
     ) : HomeEvent()
 
     class ShowStorageConnectedMessageDialog(val isVisible: Boolean) : HomeEvent()
-
-    class ShowStorageAlreadyConnectedMessageDialog(val isVisible: Boolean) : HomeEvent()
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">OMSpace</string>
+    <string name="app_name_full">Ещё одно пространство</string>
+    <string name="app_description">Лёгкий способ, чтобы хранить свои файлы</string>
+    <string name="sign_in_google">Войти с Google</string>
+    <string name="welcome_label">Привет,</string>
+    <string name="last_files_header">Последние файлы</string>
+    <string name="connect_storage">Подключить хранилище</string>
+    <string name="connect_storage_description">Выберите провайдера хранилища</string>
+</resources>

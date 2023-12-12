@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">OMSpace</string>
+    <string name="app_name_full">One More Space</string>
+    <string name="app_description">Easy way to store your files</string>
+    <string name="sign_in_google">Sign in with Google</string>
+    <string name="welcome_label">Hello,</string>
+    <string name="last_files_header">Last files</string>
+    <string name="connect_storage">Connect storage</string>
+    <string name="connect_storage_description">Choose storage provider</string>
+</resources>

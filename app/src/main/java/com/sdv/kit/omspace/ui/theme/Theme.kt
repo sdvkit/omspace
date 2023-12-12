@@ -1,0 +1,164 @@
+package com.sdv.kit.omspace.ui.theme
+
+import android.app.Activity
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.Shapes
+import androidx.compose.material3.Typography
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
+
+private val LightColors = lightColorScheme(
+    primary = md_theme_light_primary,
+    onPrimary = md_theme_light_onPrimary,
+    primaryContainer = md_theme_light_primaryContainer,
+    onPrimaryContainer = md_theme_light_onPrimaryContainer,
+    secondary = md_theme_light_secondary,
+    onSecondary = md_theme_light_onSecondary,
+    secondaryContainer = md_theme_light_secondaryContainer,
+    onSecondaryContainer = md_theme_light_onSecondaryContainer,
+    tertiary = md_theme_light_tertiary,
+    onTertiary = md_theme_light_onTertiary,
+    tertiaryContainer = md_theme_light_tertiaryContainer,
+    onTertiaryContainer = md_theme_light_onTertiaryContainer,
+    error = md_theme_light_error,
+    errorContainer = md_theme_light_errorContainer,
+    onError = md_theme_light_onError,
+    onErrorContainer = md_theme_light_onErrorContainer,
+    background = md_theme_light_background,
+    onBackground = md_theme_light_onBackground,
+    surface = md_theme_light_surface,
+    onSurface = md_theme_light_onSurface,
+    surfaceVariant = md_theme_light_surfaceVariant,
+    onSurfaceVariant = md_theme_light_onSurfaceVariant,
+    outline = md_theme_light_outline,
+    inverseOnSurface = md_theme_light_inverseOnSurface,
+    inverseSurface = md_theme_light_inverseSurface,
+    inversePrimary = md_theme_light_inversePrimary,
+    surfaceTint = md_theme_light_surfaceTint,
+    outlineVariant = md_theme_light_outlineVariant,
+    scrim = md_theme_light_scrim,
+)
+
+private val LightSpecialColors = SpecialColors(
+    successContainer = successContainer,
+    onSuccessContainer = onSuccessContainer,
+    successContainerVariant = successContainerVariant,
+    onSuccessContainerVariant = onSuccessContainerVariant,
+    warningContainer = warningContainer,
+    onWarningContainer = onWarningContainer,
+    warningContainerVariant = warningContainerVariant,
+    onWarningContainerVariant = onWarningContainerVariant
+)
+
+private val DarkColors = darkColorScheme(
+    primary = md_theme_dark_primary,
+    onPrimary = md_theme_dark_onPrimary,
+    primaryContainer = md_theme_dark_primaryContainer,
+    onPrimaryContainer = md_theme_dark_onPrimaryContainer,
+    secondary = md_theme_dark_secondary,
+    onSecondary = md_theme_dark_onSecondary,
+    secondaryContainer = md_theme_dark_secondaryContainer,
+    onSecondaryContainer = md_theme_dark_onSecondaryContainer,
+    tertiary = md_theme_dark_tertiary,
+    onTertiary = md_theme_dark_onTertiary,
+    tertiaryContainer = md_theme_dark_tertiaryContainer,
+    onTertiaryContainer = md_theme_dark_onTertiaryContainer,
+    error = md_theme_dark_error,
+    errorContainer = md_theme_dark_errorContainer,
+    onError = md_theme_dark_onError,
+    onErrorContainer = md_theme_dark_onErrorContainer,
+    background = md_theme_dark_background,
+    onBackground = md_theme_dark_onBackground,
+    surface = md_theme_dark_surface,
+    onSurface = md_theme_dark_onSurface,
+    surfaceVariant = md_theme_dark_surfaceVariant,
+    onSurfaceVariant = md_theme_dark_onSurfaceVariant,
+    outline = md_theme_dark_outline,
+    inverseOnSurface = md_theme_dark_inverseOnSurface,
+    inverseSurface = md_theme_dark_inverseSurface,
+    inversePrimary = md_theme_dark_inversePrimary,
+    surfaceTint = md_theme_dark_surfaceTint,
+    outlineVariant = md_theme_dark_outlineVariant,
+    scrim = md_theme_dark_scrim,
+)
+
+private val DarkSpecialColors = SpecialColors(
+    successContainer = successContainer,
+    onSuccessContainer = onSuccessContainer,
+    successContainerVariant = successContainerVariant,
+    onSuccessContainerVariant = onSuccessContainerVariant,
+    warningContainer = warningContainer,
+    onWarningContainer = onWarningContainer,
+    warningContainerVariant = warningContainerVariant,
+    onWarningContainerVariant = onWarningContainerVariant
+)
+
+@Composable
+fun AppTheme(
+    isDarkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
+    val colors = if (isDarkTheme) DarkColors else LightColors
+    val specialColors = if (isDarkTheme) DarkSpecialColors else LightSpecialColors
+
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = colors.primary.toArgb()
+            val controller = WindowCompat.getInsetsController(window, view)
+            controller.isAppearanceLightStatusBars = isDarkTheme
+        }
+    }
+
+    CompositionLocalProvider(
+        LocalColorPalette provides colors,
+        LocalSpecialColorPalette provides specialColors,
+        LocalTypography provides Typography,
+        LocalShapes provides Shapes,
+        content = content
+    )
+}
+
+object AppTheme {
+    val colors: ColorScheme @Composable get() = LocalColorPalette.current
+    val specialColors: SpecialColors @Composable get() = LocalSpecialColorPalette.current
+    val typography: Typography @Composable get() = LocalTypography.current
+    val shapes: Shapes @Composable get() = LocalShapes.current
+}
+
+val LocalColorPalette = staticCompositionLocalOf<ColorScheme> {
+    error(message = "Something goes wrong with colors")
+}
+
+val LocalSpecialColorPalette = staticCompositionLocalOf<SpecialColors> {
+    error(message = "Something goes wrong with special colors")
+}
+
+val LocalTypography = staticCompositionLocalOf<Typography> {
+    error(message = "Something goes wrong with typography")
+}
+
+val LocalShapes = staticCompositionLocalOf<Shapes> {
+    error(message = "Something goes wrong with shapes")
+}
+
+class SpecialColors(
+    val successContainer: Color,
+    val onSuccessContainer: Color,
+    val successContainerVariant: Color,
+    val onSuccessContainerVariant: Color,
+    val warningContainer: Color,
+    val onWarningContainer: Color,
+    val warningContainerVariant: Color,
+    val onWarningContainerVariant: Color
+)
